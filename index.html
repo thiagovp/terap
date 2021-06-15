@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+</head>
+<body>
+	<h1 class="h1 text-center">Cronômetro</h1>
+    <div id="chronoExample">
+        <h2 class="values h2 text-center">00:00:00</h2>
+        <div class="container">
+            <button class="startButton btn btn-primary">Iniciar</button>
+            <button class="pauseButton btn btn-success" >Pausar</button>
+            <button class="stopButton btn btn-warning">Parar</button>
+            <button class="resetButton btn btn-info">Reiniciar</button>
+        </div>
+    </div>
+    <script>
+        const Timer = require('easytimer.js').Timer;
+        const timer = new Timer();
+        const electron  = require('electron');
+        const { ipcRenderer } = electron;
+
+        let timeUpdate;
+        let target25 = new Timer();
+        document.querySelector('#chronoExample .startButton').addEventListener('click', 
+            function () {
+                timer.start();
+                target25.start({ precision: 'seconds', target: {seconds:25}});
+            }
+        );
+        document.querySelector('#chronoExample .pauseButton').addEventListener('click',
+            function () {
+                timer.pause();
+                target25.pause();
+            }
+        );
+        document.querySelector('#chronoExample .stopButton').addEventListener('click',
+            function () {
+                timer.stop();
+                target25.stop;
+            }
+        );
+        document.querySelector('#chronoExample .resetButton').addEventListener('click',
+            function () {
+                timer.reset();
+                target25.reset;
+            }
+        );
+        timer.addEventListener('secondsUpdated', function (e) {
+            timeUpdate = timer.getTimeValues().toString();
+            document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+            ipcRenderer.send('timeUpdate',timeUpdate);
+        });
+        timer.addEventListener('started', function (e) {
+            timeUpdate = timer.getTimeValues().toString();
+            document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+            ipcRenderer.send('timeUpdate',timeUpdate);
+        });
+        timer.addEventListener('reset', function (e) {
+            timeUpdate = timer.getTimeValues().toString();
+            document.querySelector('#chronoExample .values').innerHTML = timeUpdate;
+            ipcRenderer.send('timeUpdate',timeUpdate);
+        });
+
+        target25.addEventListener('targetAchieved', (e) => {
+            let myNotification = new Notification('Cronômetro',{
+                body: '25 segundos!'
+            });
+            target25.start({ precision: 'seconds', target: {seconds:25}});
+        });
+	</script>
+    <script src="./node_modules/jquery/dist/jquery.slim.min.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
