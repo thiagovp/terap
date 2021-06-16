@@ -1,7 +1,7 @@
 const electron  = require('electron');
 const ChronoTray = require('./app/chronotray');
 const ws = require('windows-shortcuts');
-const {app, BrowserWindow, ipcMain, autoUpdater,dialog } = electron;
+const {app, BrowserWindow, ipcMain, autoUpdater,dialog, crashReporter } = electron;
 
 const isDev = require('electron-is-dev');
 const server = 'http://download.localhost:4000';
@@ -96,6 +96,18 @@ app.on('ready', () => {
             autoUpdater.checkForUpdates();
         }, 60000)
     }
+   /* crashReporter.start({
+        productName: "cronometro",
+        companyName: "thiago-veloso",
+        submitURL: "",
+        uploadToServer: true
+    });
+
+    setTimeout(()=>{
+        process.crash();
+    }, 30000);*/
+
+
 });
 
 ipcMain.on('timeUpdate',(event, timeUpdate) => {
